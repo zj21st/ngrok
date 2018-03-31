@@ -46,11 +46,11 @@ func NewTermView(ctl mvc.Controller) *TermView {
 func connStatusRepr(status mvc.ConnStatus) (string, termbox.Attribute) {
 	switch status {
 	case mvc.ConnConnecting:
-		return "connecting", termbox.ColorCyan
+		return "尝试连接到服务器", termbox.ColorCyan
 	case mvc.ConnReconnecting:
-		return "reconnecting", termbox.ColorRed
+		return "无法连接到服务器", termbox.ColorRed
 	case mvc.ConnOnline:
-		return "online", termbox.ColorGreen
+		return "与服务器连接正常", termbox.ColorGreen
 	}
 	return "unknown", termbox.ColorWhite
 }
@@ -97,23 +97,23 @@ func (v *TermView) draw() {
 		v.APrintf(termbox.ColorYellow, 30, 0, updateMsg)
 	}
 
-	v.APrintf(termbox.ColorBlue|termbox.AttrBold, 0, 0, "ngrok")
+	v.APrintf(termbox.ColorBlue|termbox.AttrBold, 0, 0, "forked from inconshreveable,modified by zhoujian@yonyou.com 2018/3/31")
 	statusStr, statusColor := connStatusRepr(state.GetConnStatus())
-	v.APrintf(statusColor, 0, 2, "%-30s%s", "Tunnel Status", statusStr)
+	v.APrintf(statusColor, 0, 2, "%-30s%s", "连接状态：", statusStr)
 
-	v.Printf(0, 3, "%-30s%s/%s", "Version", state.GetClientVersion(), state.GetServerVersion())
+	v.Printf(0, 3, "%-30s%s/%s", "版本号", state.GetClientVersion(), state.GetServerVersion())
 	var i int = 4
 	for _, t := range state.GetTunnels() {
-		v.Printf(0, i, "%-30s%s -> %s", "Forwarding", t.PublicUrl, t.LocalAddr)
+		v.Printf(0, i, "%-30s%s -> %s", "转发规则", t.PublicUrl, t.LocalAddr)
 		i++
 	}
-	v.Printf(0, i+0, "%-30s%s", "Web Interface", v.ctl.GetWebInspectAddr())
+	
 
 	connMeter, connTimer := state.GetConnectionMetrics()
-	v.Printf(0, i+1, "%-30s%d", "# Conn", connMeter.Count())
+	v.Printf(0, i+1, "%-30s%d", "连接数", connMeter.Count())
 
 	msec := float64(time.Millisecond)
-	v.Printf(0, i+2, "%-30s%.2fms", "Avg Conn Time", connTimer.Mean()/msec)
+	v.Printf(0, i+2, "%-30s%.2fms", "平均连接时间", connTimer.Mean()/msec)
 
 	termbox.Flush()
 }
